@@ -6,7 +6,7 @@ services:
     image: openvino-jupyterlab:latest
     container_name: openvino_jupyter
     ports:
-      - "8888:8888"
+      - "0.0.0.0:8888:8888"
     volumes:
       - ./models:/workspace/models
       - ./notebooks:/workspace/notebooks
