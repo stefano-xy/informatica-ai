@@ -87,15 +87,6 @@ CMD ["jupyter", "lab", "--no-browser", "--ip=0.0.0.0", "--port=8888", \
 ```
 Per generare l'hash: `jupyter notebook password`
 
-### Isolare ogni studente (un container a testa)
-
-Modifica `docker-compose.yml`:
-```yaml
-ports:
-  - "8888-8910:8888"  # una porta per ogni studente
-```
-E usa Docker Compose con più istanze (una per studente).
-
 ### Usare un modello più capace
 
 In `docker-compose.yml`, cambia la variabile:
@@ -111,9 +102,7 @@ E nel notebook 00, cambia `HF_MODEL_ID`:
 HF_MODEL_ID = "OpenVINO/phi-2-int8-ov"  # ~1.5 GB, più capace
 ```
 
----
-
-## 📚 Modelli disponibili (già in formato OpenVINO su HuggingFace)
+Modelli disponibili (già in formato OpenVINO su HuggingFace):
 
 | Modello | Dimensione | RAM necessaria | Note |
 |---------|-----------|---------------|------|
