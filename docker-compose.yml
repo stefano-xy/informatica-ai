@@ -1,0 +1,38 @@
+services:
+
+  # ── Servizio base: CPU ───────────────────────────────────
+  jupyterlab:
+    build: .
+    image: openvino-jupyterlab:latest
+    container_name: openvino_jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./models:/workspace/models
+      - ./notebooks:/workspace/notebooks
+      - ./prof:/workspace/prof
+      - ./studenti:/workspace/studenti
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OV_LOG_LEVEL=WARNING
+      - MODEL_PATH=/workspace/models/tinyllama-chat-ov
+      - OV_DEVICE=CPU
+    restart: unless-stopped
+ 
+  # ── Profilo GPU: aggiunge /dev/dxg (bridge WSL2-DirectX) ─
+  jupyterlab-gpu:
+    extends:
+      service: jupyterlab
+    container_name: openvino_jupyter_gpu
+    profiles: [gpu]
+    devices:
+      # /dev/dxg è il device virtuale creato da WSL2
+      # per esporre la GPU Windows al sottosistema Linux.
+      # Viene creato automaticamente se il driver Intel
+      # su Windows è >= 30.0.100.9955
+      - /dev/dxg:/dev/dxg
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OV_LOG_LEVEL=WARNING
+      - MODEL_PATH=/workspace/models/tinyllama-chat-ov
+      - OV_DEVICE=GPU

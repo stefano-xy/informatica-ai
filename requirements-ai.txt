@@ -1,0 +1,8 @@
+# ── OpenVINO ────────────────────────────────────────────────
+openvino>=2026.1.0
+openvino-genai>=2026.1.0
+
+# ── Download e conversione modelli ─────────────────────────
+optimum-intel[openvino]>=1.18.0
+huggingface_hub>=0.23.0
+transformers>=4.40.0
