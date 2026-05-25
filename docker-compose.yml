@@ -12,6 +12,8 @@ services:
       - ./notebooks:/workspace/notebooks
       - ./prof:/workspace/prof
       - ./studenti:/workspace/studenti
+      # Supporto driver di Windows
+      - /usr/lib/wsl:/usr/lib/wsl:ro
     environment:
       - PYTHONUNBUFFERED=1
       - OV_LOG_LEVEL=WARNING
@@ -25,6 +27,10 @@ services:
       service: jupyterlab
     container_name: openvino_jupyter_gpu
     profiles: [gpu]
+    group_add:
+      # Permessi (Group ID) per accedere ai device GPU
+      - "44"    # video
+      - "992"  # render
     devices:
       # /dev/dxg è il device virtuale creato da WSL2
       # per esporre la GPU Windows al sottosistema Linux.

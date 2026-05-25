@@ -17,10 +17,11 @@ informatica-ai/
 ├── prof/                    ← Cartella condivisa per i notebook dei prof
 ├── studenti/                ← Cartella condivisa per i notebook degli studenti
 └── notebooks/
-    ├── 00_setup_modello.ipynb     ← Scarica il modello (solo prof)
-    ├── 01_primo_prompt.ipynb      ← Introduzione: prompt e risposta
+    ├── 00_setup_modello.ipynb        ← Scarica il modello (solo prof)
+    ├── 01_primo_prompt.ipynb         ← Introduzione: prompt e risposta
     ├── 02_chatbot_interattivo.ipynb  ← Chatbot con UI grafica
-    └── 03_esercizi.ipynb          ← Esercizi con TODO
+    ├── 03_esercizi.ipynb             ← Esercizi con TODO
+    └── 04_dispositivi_gpu_npu.ipynb  ← Test dei dispositivi per fare inferenza su GPU
 ```
 
 ---
