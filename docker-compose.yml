@@ -1,18 +1,12 @@
 services:
 
   # ── Servizio base: CPU ───────────────────────────────────
-  jupyterlab:
+  jupyterlab-wsl-base:
     build: .
-    image: openvino-jupyterlab:latest
-    container_name: openvino_jupyter
     ports:
       - "0.0.0.0:8888:8888"
     volumes:
-      - ./models:/workspace/models
-      - ./notebooks:/workspace/notebooks
-      - ./prof:/workspace/prof
-      - ./studenti:/workspace/studenti
-      # Supporto driver di Windows
+      # Supporto driver WSL di Windows
       - /usr/lib/wsl:/usr/lib/wsl:ro
     environment:
       - PYTHONUNBUFFERED=1
@@ -21,10 +15,29 @@ services:
       - OV_DEVICE=CPU
     restart: unless-stopped
  
-  # ── Profilo GPU: aggiunge /dev/dxg (bridge WSL2-DirectX) ─
-  jupyterlab-gpu:
+  # Servizio per amministrare Jupyter, scaricare modelli AI
+  # e lavorare sui notebook del professore
+  jupyterlab-wsl-prof:
     extends:
-      service: jupyterlab
+      service: jupyterlab-wsl-base
+    volumes:
+      - ./models:/workspace/models
+      - ./prof:/workspace/prof
+      - ./studenti:/workspace/studenti
+
+  # Servizio per consentire agli studenti di lavorare sui
+  # propri notebook e avere accesso ai modelli AI in sola lettura
+  jupyterlab-wsl-studenti:
+    extends:
+      service: jupyterlab-wsl-base
+    volumes:
+      - ./models:/workspace/models:ro
+      - ./studenti:/workspace/studenti
+
+  # ── Profilo GPU: aggiunge /dev/dxg (bridge WSL2-DirectX) ─
+  jupyterlab-gpu-base:
+    extends:
+      service: jupyterlab-wsl-base
     container_name: openvino_jupyter_gpu
     profiles: [gpu]
     group_add:
