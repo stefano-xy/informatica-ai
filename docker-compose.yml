@@ -3,23 +3,23 @@ services:
   # ── Servizio base: CPU ───────────────────────────────────
   jupyterlab-wsl-base:
     build: .
-    ports:
-      - "0.0.0.0:8888:8888"
-    volumes:
-      # Supporto driver WSL di Windows
-      - /usr/lib/wsl:/usr/lib/wsl:ro
     environment:
       - PYTHONUNBUFFERED=1
       - OV_LOG_LEVEL=WARNING
       - MODEL_PATH=/workspace/models/tinyllama-chat-ov
       - OV_DEVICE=CPU
     restart: unless-stopped
- 
+    volumes:
+      # Supporto driver WSL di Windows
+      - /usr/lib/wsl:/usr/lib/wsl:ro
+
   # Servizio per amministrare Jupyter, scaricare modelli AI
   # e lavorare sui notebook del professore
   jupyterlab-wsl-prof:
     extends:
       service: jupyterlab-wsl-base
+    ports:
+      - "0.0.0.0:8889:8888"
     volumes:
       - ./models:/workspace/models
       - ./prof:/workspace/prof
@@ -30,20 +30,24 @@ services:
   jupyterlab-wsl-studenti:
     extends:
       service: jupyterlab-wsl-base
+    ports:
+      - "0.0.0.0:8888:8888"
     volumes:
       - ./models:/workspace/models:ro
+      # - ./prof:/workspace/prof:ro
       - ./studenti:/workspace/studenti
 
   # ── Profilo GPU: aggiunge /dev/dxg (bridge WSL2-DirectX) ─
-  jupyterlab-gpu-base:
+  jupyterlab-wls-gpu-base:
     extends:
       service: jupyterlab-wsl-base
-    container_name: openvino_jupyter_gpu
     profiles: [gpu]
+    ports:
+      - "0.0.0.0:8888:8888"
     group_add:
       # Permessi (Group ID) per accedere ai device GPU
       - "44"    # video
-      - "992"  # render
+      - "992"   # render
     devices:
       # /dev/dxg è il device virtuale creato da WSL2
       # per esporre la GPU Windows al sottosistema Linux.
@@ -51,7 +55,8 @@ services:
       # su Windows è >= 30.0.100.9955
       - /dev/dxg:/dev/dxg
     environment:
-      - PYTHONUNBUFFERED=1
-      - OV_LOG_LEVEL=WARNING
-      - MODEL_PATH=/workspace/models/tinyllama-chat-ov
       - OV_DEVICE=GPU
+    volumes:
+      - ./models:/workspace/models
+      - ./prof:/workspace/prof
+      - ./studenti:/workspace/studenti

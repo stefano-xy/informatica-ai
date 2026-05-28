@@ -13,16 +13,27 @@ informatica-ai/
 ├── docker-compose.yml       ← Avvio con un comando, configurazione CPU e GPU
 ├── requirements.txt         ← Dipendenze Python Jupyter
 ├── requirements-ai.txt      ← Dipendenze Python AI
-├── models/                  ← Modelli AI (creata automaticamente)
-├── prof/                    ← Cartella condivisa per i notebook dei prof
-├── studenti/                ← Cartella condivisa per i notebook degli studenti
-└── notebooks/
-    ├── 00_setup_modello.ipynb        ← Scarica il modello (solo prof)
-    ├── 01_primo_prompt.ipynb         ← Introduzione: prompt e risposta
-    ├── 02_chatbot_interattivo.ipynb  ← Chatbot con UI grafica
-    ├── 03_esercizi.ipynb             ← Esercizi con TODO
-    └── 04_dispositivi_gpu_npu.ipynb  ← Test dei dispositivi per fare inferenza su GPU
+├── models/                  ← Modelli AI (creata automaticamente, non in git)
+├── prof/                    ← Notebook del professore
+│   ├── 00_setup_modello.ipynb        ← Scarica il modello (solo prof)
+│   ├── 01_primo_prompt.ipynb         ← Introduzione: prompt e risposta
+│   ├── 02_chatbot_interattivo.ipynb  ← Chatbot con UI grafica
+│   ├── 03_esercizi.ipynb             ← Esercizi con TODO
+│   └── 04_dispositivi_gpu_npu.ipynb  ← Test dei dispositivi per fare inferenza su GPU
+└── studenti/                ← Cartella di lavoro degli studenti
 ```
+
+---
+
+## 🖥️ Servizi disponibili
+
+| Servizio | Porta | Accesso |
+|---|---|---|
+| `jupyterlab-wsl-prof` | **8889** | Prof: accesso completo a `prof/`, `studenti/`, `models/` |
+| `jupyterlab-wsl-studenti` | **8888** | Studenti: `prof/` e `models/` in sola lettura, `studenti/` in scrittura |
+| `jupyterlab-gpu-base` | **8888** | Prof con GPU Intel — avviare con `--profile gpu` |
+
+I servizi prof e studenti possono girare **contemporaneamente** su porte diverse.
 
 ---
 
@@ -36,12 +47,23 @@ docker compose build
 
 ### 2. Scarica il modello AI (una volta sola)
 
-Oppure avvia JupyterLab e apri/esegui il notebook `00_setup_modello` tu stesso.
-
-### 3. Avvia il server per la lezione
+Avvia il servizio del professore, apri JupyterLab ed esegui il notebook `prof/00_setup_modello`:
 
 ```bash
-docker compose up -d
+docker compose up jupyterlab-wsl-prof -d
+```
+
+Poi apri `http://localhost:8889`, esegui tutte le celle di `prof/00_setup_modello.ipynb`
+e aspetta il completamento del download (~600 MB).
+
+### 3. Avvia i servizi per la lezione
+
+```bash
+# Solo studenti (porta 8889)
+docker compose up jupyterlab-wsl-studenti -d
+
+# Oppure entrambi contemporaneamente (prof su 8888, studenti su 8889)
+docker compose up jupyterlab-wsl-prof jupyterlab-wsl-studenti -d
 ```
 
 ### 4. Comunica agli studenti l'indirizzo
@@ -69,7 +91,7 @@ docker compose down
 > 1. Apri **Safari** sul tuo iPad
 > 2. Digita nella barra degli indirizzi: **http://192.168.1.XX:8888**
 >    (il professore ti dirà l'IP corretto)
-> 3. Apri la cartella **notebooks/**
+> 3. Apri la cartella **prof/**
 > 4. Inizia dal notebook **01_primo_prompt.ipynb**
 > 5. Usa il menu **Run → Run All Cells** per eseguire tutto
 > 6. Salva i tuoi esperimenti nella cartella **studenti/**
@@ -86,6 +108,17 @@ CMD ["jupyter", "lab", "--no-browser", "--ip=0.0.0.0", "--port=8888", \
      "--allow-root", "--PasswordIdentityProvider.hashed_password=''"]
 ```
 Per generare l'hash: `jupyter notebook password`
+
+### Usare la GPU Intel (WSL2)
+
+```bash
+docker compose --profile gpu up -d
+```
+
+Pre-requisito su Windows: driver Intel Graphics >= 30.0.100.9955
+([scarica qui](https://www.intel.com/content/www/us/en/download/19344/))
+
+> **Nota**: la NPU Intel **non è supportata** in WSL2 (limite del kernel WSL).
 
 ### Usare un modello più capace
 
