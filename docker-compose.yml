@@ -8,6 +8,7 @@ services:
       - OV_LOG_LEVEL=WARNING
       - MODEL_PATH=/workspace/models/tinyllama-chat-ov
       - OV_DEVICE=CPU
+      - JUPYTER_PASSWORD
     restart: unless-stopped
     volumes:
       # Supporto driver WSL di Windows

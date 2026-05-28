@@ -47,10 +47,11 @@ RUN jupyter lab --generate-config && \
     echo "c.ServerApp.ip = '0.0.0.0'" >> /root/.jupyter/jupyter_lab_config.py && \
     echo "c.ServerApp.open_browser = False" >> /root/.jupyter/jupyter_lab_config.py && \
     echo "c.ServerApp.allow_root = True" >> /root/.jupyter/jupyter_lab_config.py && \
-    echo "c.ServerApp.root_dir = '/workspace'" >> /root/.jupyter/jupyter_lab_config.py && \
-    echo "c.ServerApp.token = ''" >> /root/.jupyter/jupyter_lab_config.py && \
-    echo "c.ServerApp.password = ''" >> /root/.jupyter/jupyter_lab_config.py
+    echo "c.ServerApp.root_dir = '/workspace'" >> /root/.jupyter/jupyter_lab_config.py
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 8888
 
-CMD ["jupyter", "lab", "--no-browser", "--ip=0.0.0.0", "--port=8888", "--allow-root"]
+ENTRYPOINT ["/entrypoint.sh"]

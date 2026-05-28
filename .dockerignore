@@ -1,0 +1,8 @@
+.env
+.git
+.gitignore
+.ipynb_checkpoints
+models/
+studenti/
+prof/
+README.md
