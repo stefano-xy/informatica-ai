@@ -28,6 +28,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Variabile OpenCL richiesta da OpenVINO per trovare il driver ICD
 ENV OCL_ICD_VENDORS=/etc/OpenCL/vendors
 
+# Configurazione directory
+RUN mkdir -p /workspace/models /workspace/prof /workspace/studenti
 WORKDIR /workspace
 
 # ── Dipendenze Python ──────────────────────────────────────
@@ -35,6 +37,10 @@ COPY requirements.txt .
 COPY requirements-ai.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir -r requirements-ai.txt
+
+# Cleanup
+RUN rm requirements.txt
+RUN rm requirements-ai.txt
 
 # ── Configurazione JupyterLab ──────────────────────────────
 RUN jupyter lab --generate-config && \
@@ -44,10 +50,6 @@ RUN jupyter lab --generate-config && \
     echo "c.ServerApp.root_dir = '/workspace'" >> /root/.jupyter/jupyter_lab_config.py && \
     echo "c.ServerApp.token = ''" >> /root/.jupyter/jupyter_lab_config.py && \
     echo "c.ServerApp.password = ''" >> /root/.jupyter/jupyter_lab_config.py
-
-# ── Notebook didattici ─────────────────────────────────────
-COPY notebooks/ /workspace/notebooks/
-RUN mkdir -p /workspace/models /workspace/studenti
 
 EXPOSE 8888
 
